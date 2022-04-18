@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Body, Param } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Put, Patch } from '@nestjs/common';
 import { BoardService } from './board.service';
 import { BoardEntity } from './entity/board.entity';
 import { ReplyEntity } from './entity/reply.entity';
+import { UpdateResult } from 'typeorm';
 
 @Controller('board')
 export class BoardController {
@@ -20,6 +21,14 @@ export class BoardController {
   @Post()
   async saveBoard(@Body() board: BoardEntity): Promise<BoardEntity> {
     return await this.boardService.saveBoard(board);
+  }
+
+  @Patch('/:boardId')
+  async modifyBoard(
+    @Param('boardId') boardId: number,
+    @Body() board: BoardEntity,
+  ): Promise<UpdateResult> {
+    return await this.boardService.modifyBoard(boardId, board);
   }
 
   @Post('/reply/:boardId')

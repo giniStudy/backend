@@ -4,6 +4,7 @@ import { BoardEntity } from './entity/board.entity';
 import { BoardRepository } from './entity/board.repository';
 import { ReplyEntity } from './entity/reply.entity';
 import { ReplyRepository } from './entity/reply.repository';
+import { UpdateResult } from 'typeorm';
 
 @Injectable()
 export class BoardService {
@@ -25,6 +26,10 @@ export class BoardService {
 
   saveBoard(board: BoardEntity): Promise<BoardEntity> {
     return this.boardRepository.save(board);
+  }
+
+  modifyBoard(boardId: number, board: BoardEntity): Promise<UpdateResult> {
+    return this.boardRepository.update(boardId, board);
   }
 
   async saveReply(reply: ReplyEntity): Promise<ReplyEntity> {

@@ -31,3 +31,13 @@ export class BoardEntity {
   @OneToMany(() => ReplyEntity, (reply) => reply.board, { nullable: true })
   replys: ReplyEntity[];
 }
+
+export class BoardDto {
+  id: number;
+  title: string;
+  content: string;
+  writer: string;
+  createDate: Date;
+  updateDate: Date;
+  replys: ReplyEntity[];
+}
