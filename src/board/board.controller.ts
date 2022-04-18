@@ -7,8 +7,8 @@ import { ReplyEntity } from './entity/reply.entity';
 export class BoardController {
   constructor(private readonly boardService: BoardService) {}
 
-  @Get(':boardId')
-  async getBoard(@Param() boardId: string): Promise<BoardEntity> {
+  @Get('/:boardId')
+  async getBoard(@Param('boardId') boardId: number): Promise<BoardEntity> {
     return await this.boardService.getBoard(boardId);
   }
 
@@ -22,14 +22,15 @@ export class BoardController {
     return await this.boardService.saveBoard(board);
   }
 
-  @Post('/reply')
+  @Post('/reply/:boardId')
   async saveReply(
     @Body() reply: ReplyEntity,
-    @Param() boardId: string,
-  ): Promise<BoardEntity> {
+    @Param('boardId') boardId: number,
+  ): Promise<ReplyEntity> {
     const board = await this.boardService.getBoard(boardId);
     const savedReply = await this.boardService.saveReply(reply);
     board.replys.push(savedReply);
-    return await this.boardService.saveBoard(board);
+    await this.boardService.saveBoard(board);
+    return savedReply;
   }
 }

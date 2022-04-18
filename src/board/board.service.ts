@@ -12,8 +12,11 @@ export class BoardService {
     @InjectRepository(ReplyEntity) private replyRepository: ReplyRepository,
   ) {}
 
-  getBoard(boardId: string): Promise<BoardEntity> {
-    return this.boardRepository.findOneById(boardId);
+  getBoard(boardId: number): Promise<BoardEntity> {
+    return this.boardRepository.findOne({
+      where: { id: boardId },
+      relations: ['replys'],
+    });
   }
 
   getAllBoards(): Promise<BoardEntity[]> {

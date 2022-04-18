@@ -28,6 +28,6 @@ export class BoardEntity {
   @UpdateDateColumn({ name: 'update_date', comment: '수정일' })
   updatedDate: Date;
 
-  @OneToMany((type) => ReplyEntity, (reply) => reply.board, { nullable: true })
+  @OneToMany(() => ReplyEntity, (reply) => reply.board, { nullable: true })
   replys: ReplyEntity[];
 }

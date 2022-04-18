@@ -22,7 +22,6 @@ export class ReplyEntity {
   @CreateDateColumn({ name: 'create_date', comment: '생성일' })
   createdDate: Date;
 
-  @ManyToOne((type) => BoardEntity, (board) => board.replys)
-  @JoinColumn({ name: 'board_id' })
+  @ManyToOne(() => BoardEntity, (board) => board.replys)
   board: BoardEntity;
 }
