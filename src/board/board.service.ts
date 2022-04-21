@@ -4,9 +4,10 @@ import { BoardEntity } from './entity/board.entity';
 import { BoardRepository } from './entity/board.repository';
 import { ReplyEntity } from './entity/reply.entity';
 import { ReplyRepository } from './entity/reply.repository';
-import { UpdateResult } from 'typeorm';
+import { UpdateResult, DeleteResult } from 'typeorm';
 import { BoardDto } from './dto/board.dto';
 import { ReplyDto } from './dto/reply.dto';
+import { STATUS } from 'interfaces';
 
 @Injectable()
 export class BoardService {
@@ -15,18 +16,18 @@ export class BoardService {
     @InjectRepository(ReplyEntity) private replyRepository: ReplyRepository,
   ) {}
 
-  getBoard(boardId: number): Promise<BoardEntity> {
+  getBoard(boardId: number): Promise<BoardDto> {
     return this.boardRepository.findOne({
       where: { id: boardId },
       relations: ['replys'],
     });
   }
 
-  getAllBoards(): Promise<BoardEntity[]> {
-    return this.boardRepository.find();
+  getAllBoards(): Promise<BoardDto[]> {
+    return this.boardRepository.find({ where: { status: STATUS.PUBLIC } });
   }
 
-  saveBoard(boardDto: BoardDto): Promise<BoardEntity> {
+  saveBoard(boardDto: BoardDto): Promise<BoardDto> {
     const { writer, title, content } = boardDto;
     const board = BoardEntity.from(writer, title, content);
     return this.boardRepository.save(board);
@@ -38,9 +39,26 @@ export class BoardService {
     return this.boardRepository.update(boardId, board);
   }
 
-  async saveReply(replyDto: ReplyDto): Promise<ReplyEntity> {
+  deleteBoard(boardId: number): Promise<DeleteResult> {
+    return this.boardRepository.delete({ id: boardId });
+  }
+
+  async saveReply(boardId: number, replyDto: ReplyDto): Promise<ReplyDto> {
+    const { writer, content } = replyDto;
+    const board = await this.boardRepository.findOne({
+      where: { id: boardId },
+    });
+    const reply = ReplyEntity.from(writer, content, board);
+    return this.replyRepository.save(reply);
+  }
+
+  modifyReply(replyId: number, replyDto: ReplyDto): Promise<UpdateResult> {
     const { writer, content } = replyDto;
     const reply = ReplyEntity.from(writer, content);
-    return this.replyRepository.save(reply);
+    return this.replyRepository.update(replyId, reply);
+  }
+
+  deleteReply(replyId: number): Promise<DeleteResult> {
+    return this.replyRepository.delete({ id: replyId });
   }
 }

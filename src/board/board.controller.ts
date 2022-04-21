@@ -1,8 +1,15 @@
-import { Controller, Get, Post, Body, Param, Put, Patch } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Patch,
+  Delete,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { BoardService } from './board.service';
-import { BoardEntity } from './entity/board.entity';
-import { ReplyEntity } from './entity/reply.entity';
-import { UpdateResult } from 'typeorm';
+import { UpdateResult, DeleteResult } from 'typeorm';
 import { BoardDto } from './dto/board.dto';
 import { ReplyDto } from './dto/reply.dto';
 
@@ -11,17 +18,17 @@ export class BoardController {
   constructor(private readonly boardService: BoardService) {}
 
   @Get('/:boardId')
-  async getBoard(@Param('boardId') boardId: number): Promise<BoardEntity> {
+  async getBoard(@Param('boardId') boardId: number): Promise<BoardDto> {
     return await this.boardService.getBoard(boardId);
   }
 
   @Get()
-  async getAllBoards(): Promise<BoardEntity[]> {
+  async getAllBoards(): Promise<BoardDto[]> {
     return await this.boardService.getAllBoards();
   }
 
   @Post()
-  async saveBoard(@Body() boardDto: BoardDto): Promise<BoardEntity> {
+  async saveBoard(@Body() boardDto: BoardDto): Promise<BoardDto> {
     return await this.boardService.saveBoard(boardDto);
   }
 
@@ -33,15 +40,33 @@ export class BoardController {
     return await this.boardService.modifyBoard(boardId, boardDto);
   }
 
+  @Delete('/:boardId')
+  async deleteBoard(@Param('boardId') boardId: number): Promise<DeleteResult> {
+    return await this.boardService.deleteBoard(boardId);
+  }
+
   @Post('/reply/:boardId')
   async saveReply(
     @Body() replyDto: ReplyDto,
     @Param('boardId') boardId: number,
-  ): Promise<ReplyEntity> {
+  ): Promise<ReplyDto> {
     const board = await this.boardService.getBoard(boardId);
-    const savedReply = await this.boardService.saveReply(replyDto);
+    const savedReply = await this.boardService.saveReply(boardId, replyDto);
     board.replys.push(savedReply);
     await this.boardService.saveBoard(board);
     return savedReply;
+  }
+
+  @Patch('/reply/:replyId')
+  async modifyReply(
+    @Param('replyId') replyId: number,
+    @Body() replyDto: ReplyDto,
+  ): Promise<UpdateResult> {
+    return await this.boardService.modifyReply(replyId, replyDto);
+  }
+
+  @Delete('reply/:replyId')
+  async deleteReply(@Param('replyId') replyId: number): Promise<DeleteResult> {
+    return await this.boardService.deleteReply(replyId);
   }
 }

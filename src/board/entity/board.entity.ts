@@ -7,6 +7,7 @@ import {
   OneToMany,
 } from 'typeorm';
 import { ReplyEntity } from './reply.entity';
+import { STATUS } from 'interfaces';
 
 @Entity()
 export class BoardEntity {
@@ -22,6 +23,9 @@ export class BoardEntity {
   @Column()
   writer: string;
 
+  @Column({ default: STATUS.PUBLIC })
+  status: STATUS;
+
   @CreateDateColumn({ name: 'create_date', comment: '생성일' })
   createdDate: Date;
 
@@ -31,11 +35,11 @@ export class BoardEntity {
   @OneToMany(() => ReplyEntity, (reply) => reply.board, { nullable: true })
   replys: ReplyEntity[];
 
-  static from(title: string, content: string, writer: string) {
+  static from(writer: string, title: string, content: string) {
     const board = new BoardEntity();
+    board.writer = writer;
     board.title = title;
     board.content = content;
-    board.writer = writer;
     return board;
   }
 }
