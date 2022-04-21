@@ -24,4 +24,11 @@ export class ReplyEntity {
 
   @ManyToOne(() => BoardEntity, (board) => board.replys)
   board: BoardEntity;
+
+  static from(content: string, writer: string) {
+    const reply = new ReplyEntity();
+    reply.content = content;
+    reply.writer = writer;
+    return reply;
+  }
 }
